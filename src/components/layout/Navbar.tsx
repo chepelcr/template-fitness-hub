@@ -27,7 +27,7 @@ export default function Navbar() {
                 <Dumbbell className="w-8 h-8 text-red-600" />
               )}
               <span className="gradient-energy bg-clip-text text-transparent">
-                {organization?.name || 'FITNESS HUB'}
+                {organization?.name}
               </span>
             </a>
           </Link>

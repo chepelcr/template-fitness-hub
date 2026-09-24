@@ -1,4 +1,4 @@
-import { Dumbbell, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
+import { Dumbbell, Facebook, Instagram, Twitter } from 'lucide-react';
 import { useSubdomainContext } from '@/contexts/SubdomainContext';
 import { useContact, useHomePageSections } from '@/hooks/useContent';
 import { useTheme } from '@/hooks/useContent';
@@ -23,7 +23,7 @@ export default function Footer() {
                 <Dumbbell className="w-8 h-8 text-red-600" />
               )}
               <span className="text-xl font-black tracking-tight gradient-energy bg-clip-text text-transparent">
-                {organization?.name || 'FITNESS HUB'}
+                {organization?.name}
               </span>
             </div>
             <p className="text-gray-400 text-sm">
@@ -31,18 +31,21 @@ export default function Footer() {
               and wellness products for champions.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="hover:text-red-600 transition-colors">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-red-600 transition-colors">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-orange-600 transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-red-600 transition-colors">
-                <Youtube className="w-5 h-5" />
-              </a>
+              {contact?.facebookUrl && (
+                <a href={contact.facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">
+                  <Facebook className="w-5 h-5" />
+                </a>
+              )}
+              {contact?.instagramUrl && (
+                <a href={contact.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-red-600 transition-colors">
+                  <Instagram className="w-5 h-5" />
+                </a>
+              )}
+              {contact?.twitterUrl && (
+                <a href={contact.twitterUrl} target="_blank" rel="noopener noreferrer" className="hover:text-orange-600 transition-colors">
+                  <Twitter className="w-5 h-5" />
+                </a>
+              )}
             </div>
           </div>
 
@@ -124,7 +127,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
           <p>
-            &copy; {new Date().getFullYear()} {organization?.name || 'Fitness Hub'}. All rights reserved.
+            &copy; {new Date().getFullYear()} {organization?.name}. All rights reserved.
             | Built with determination.
           </p>
         </div>
