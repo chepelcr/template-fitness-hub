@@ -19,6 +19,8 @@ import { useCartStore } from "@/store/cart";
 import { generateWhatsAppMessage } from "@/lib/whatsapp";
 import { whatsappPhone, whatsappUrl } from "@chepelcr/tsuru-storefront-sdk";
 import { useContact } from "@/hooks/useContent";
+import { useSubdomainContext } from "@/contexts/SubdomainContext";
+import { getApiClient } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import CheckoutAddress, {
   type AddressNames,
@@ -42,6 +44,8 @@ const EMPTY_NAMES: AddressNames = {
 
 export default function CheckoutModal() {
   const { data: contact } = useContact();
+  const { config } = useSubdomainContext();
+  const [submitting, setSubmitting] = useState(false);
   const { showCheckout, setShowCheckout, items, total, clearCart } = useCartStore();
   const { toast } = useToast();
 
@@ -57,7 +61,7 @@ export default function CheckoutModal() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validation
@@ -85,6 +89,40 @@ export default function CheckoutModal() {
     }
 
     // Generate WhatsApp message with location names
+    // Place the order with the store first — same structured address
+    // (provincia/cantón/distrito/barrio ids) as an internal order — then hand
+    // its tracking number to WhatsApp. The WhatsApp tab opens now, inside the
+    // click, so popup blockers let it through after the request.
+    const storePhone = whatsappPhone(contact);
+    const waWindow = storePhone ? window.open("", "_blank") : null;
+    let trackingNumber: string | null = null;
+    if (config && config.mode !== "demo" && config.orgId) {
+      setSubmitting(true);
+      try {
+        const order = await getApiClient("prod", config.orgId).createOrder({
+          customerName: formData.customerName,
+          customerPhone: formData.customerPhone,
+          deliveryMethod: formData.deliveryMethod || null,
+          address: {
+            stateId: address.state_id,
+            countyId: address.county_id,
+            districtId: address.district_id,
+            neighborhoodId: address.neighborhood_id,
+            address: address.address,
+          },
+          items: items.map((item) => ({ productId: item.id, quantity: item.quantity })),
+          comment: null,
+        });
+        trackingNumber = order.trackingNumber;
+      } catch {
+        waWindow?.close();
+        alert("No pudimos registrar tu pedido. Intentá de nuevo en un momento.");
+        return;
+      } finally {
+        setSubmitting(false);
+      }
+    }
+
     const message = generateWhatsAppMessage({
       items,
       total,
@@ -103,13 +141,15 @@ export default function CheckoutModal() {
     });
 
     // Placeholder WhatsApp number - should be configured per template
-    // Orders go to the store's own WhatsApp (else its phone), never a placeholder.
-    const storePhone = whatsappPhone(contact);
-    if (!storePhone) {
+    const handoff = trackingNumber ? `Pedido #${trackingNumber}\n\n${message}` : message;
+    if (storePhone && waWindow) {
+      waWindow.location.href = whatsappUrl(storePhone, handoff);
+    } else if (trackingNumber) {
+      alert(`Pedido #${trackingNumber} registrado. La tienda te contactará al ${formData.customerPhone}.`);
+    } else {
       alert("Esta tienda todavía no configuró un número de WhatsApp para recibir pedidos.");
       return;
     }
-    window.open(whatsappUrl(storePhone, message), "_blank");
 
     // Clear cart and close modal
     clearCart();
@@ -210,6 +250,7 @@ export default function CheckoutModal() {
             </div>
             <Button
               type="submit"
+              disabled={submitting}
               className="w-full bg-green-500 hover:bg-green-600 text-white py-4 px-6 h-auto font-black transition-colors flex items-center justify-center space-x-2"
             >
               <i className="fab fa-whatsapp"></i>
