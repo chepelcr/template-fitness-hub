@@ -1,6 +1,6 @@
 # Fitness Hub Template
 
-Premium fitness equipment and wellness e-commerce template for JMarkets platform.
+Premium fitness equipment and wellness e-commerce template for Tsuru platform.
 
 ## Theme Specifications
 
