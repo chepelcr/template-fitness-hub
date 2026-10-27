@@ -1,214 +1,186 @@
 import { Link } from 'wouter';
-import { Zap, Target, TrendingUp, Award, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useCartStore } from '@/store/cart';
+import { categoriesWithItems, facetsFor, featuredItems, homeContent, paragraphs, useCatalog, useCmsPage, usePageMeta } from '@/core';
+import { useI18n } from '@/i18n';
+import { CmsIcon } from '@/components/CmsIcon';
+import { LaneLines } from '@/components/LaneLines';
+import { Placeholder } from '@/components/Placeholder';
+import { RunCard, RunCardSkeleton } from '@/components/RunCard';
+import { SectionError } from '@/components/StoreStates';
+import { StoreImage } from '@/components/StoreImage';
+import { TrackLanes } from '@/components/TrackLanes';
 
 export default function Home() {
-  const { addToCart } = useCartStore();
+  const { t } = useI18n();
+  const cms = useCmsPage('home');
+  const home = homeContent(cms.page);
+  const catalog = useCatalog();
+  usePageMeta(cms.page?.title, cms.page?.metaDescription);
+
+  const featured = featuredItems(catalog.items, 6);
+  const lanes = categoriesWithItems(catalog.categories, catalog.items);
+  const counts = facetsFor(catalog.items).categories;
+  const categoryOf = (id: string | null) => catalog.categories.find((c) => c.id === id);
+  const story = paragraphs(home.story.content);
+
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gray-900 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 to-orange-600/20"></div>
-        <div className="container mx-auto px-4 py-24 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl"
-          >
-            <h1 className="text-6xl md:text-7xl font-black mb-6 leading-tight">
-              TRANSFORM YOUR
-              <span className="block gradient-energy bg-clip-text text-transparent">
-                FITNESS JOURNEY
-              </span>
-            </h1>
-            <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-              Premium equipment. Expert guidance. Unstoppable results. Join
-              thousands of athletes achieving their goals with Fitness Hub.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/products">
-                <a className="btn-energy flex items-center gap-2">
-                  SHOP NOW
-                  <ArrowRight className="w-5 h-5" />
-                </a>
-              </Link>
-              <button className="bg-transparent border-2 border-white text-white font-bold py-3 px-6 rounded-lg hover:bg-white hover:text-gray-900 transition-all">
-                EXPLORE PROGRAMS
-              </button>
+    <>
+      <section className="track on-track relative overflow-hidden">
+        <div className="page grid items-stretch gap-10 md:grid-cols-12">
+          <div className="py-12 md:col-span-6 md:py-20 md:pr-16">
+            {cms.isLoading ? (
+              <div aria-hidden="true" className="flex flex-col gap-4">
+                <div className="skeleton-deep h-7 w-48" />
+                <div className="skeleton-deep h-20 w-full" />
+                <div className="skeleton-deep h-5 w-3/4" />
+              </div>
+            ) : cms.isError ? (
+              <SectionError title={t('state.error.title')} onRetry={cms.refetch} />
+            ) : (
+              <>
+                {home.hero.badge && <p className="mb-5 w-fit rounded-md bg-[rgb(0_0_0/0.2)] px-3 py-1 font-semibold">{home.hero.badge}</p>}
+                {home.hero.title && <h1 className="text-[clamp(3.25rem,9vw,7rem)]">{home.hero.title}</h1>}
+                {home.hero.subtitle && <p className="mt-6 max-w-[34rem] text-xl">{home.hero.subtitle}</p>}
+                <div className="mt-9 flex flex-wrap gap-3">
+                  {home.hero.ctaPrimary && (
+                    <Link href="/products" className="btn btn-lane">
+                      {home.hero.ctaPrimary}
+                    </Link>
+                  )}
+                  {home.hero.ctaSecondary && (
+                    <Link href="/contact" className="btn btn-on-deep">
+                      {home.hero.ctaSecondary}
+                    </Link>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+          {home.hero.image && (
+            <div className="relative -mx-[var(--gutter)] min-h-[18rem] md:col-span-6 md:mx-0 md:-mr-[var(--gutter)] md:min-h-0">
+              <div className="slant absolute inset-0 bg-surface-deep">
+                <StoreImage src={home.hero.image} alt="" priority sizes="(min-width: 768px) 50vw, 100vw" maxWidth={1400} fallback={<Placeholder tone="deep" />} />
+              </div>
+              <LaneLines />
             </div>
-          </motion.div>
+          )}
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-black mb-4 text-gray-900">
-              WHY CHOOSE <span className="text-red-600">FITNESS HUB</span>
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              We provide everything you need to reach your peak performance
-            </p>
-          </div>
+      {(lanes.length > 0 || catalog.isLoading) && (
+        <section aria-labelledby={home.categories.title ? 'home-lanes' : undefined} className="page pt-16">
+          {(home.categories.title || home.categories.subtitle) && (
+            <div className="mb-6 max-w-2xl">
+              {home.categories.title && (
+                <h2 id="home-lanes" className="text-[clamp(2.4rem,5vw,3.75rem)] text-heading">
+                  {home.categories.title}
+                </h2>
+              )}
+              {home.categories.subtitle && <p className="mt-2 text-lg text-ink-soft">{home.categories.subtitle}</p>}
+            </div>
+          )}
+          {catalog.isLoading ? (
+            <div aria-hidden="true" className="skeleton h-72 rounded-frame" />
+          ) : (
+            <TrackLanes categories={lanes} counts={counts} />
+          )}
+        </section>
+      )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="card-fitness p-6 text-center"
-              >
-                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-red-600 to-orange-600 rounded-full flex items-center justify-center">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-black mb-2 text-gray-900">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 text-sm">{feature.description}</p>
-              </motion.div>
-            ))}
+      <section aria-labelledby={home.featured.title ? 'home-start' : undefined} className="page pt-16">
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+          <div className="max-w-2xl">
+            {home.featured.badge && <p className="mb-2 font-semibold text-accent-text">{home.featured.badge}</p>}
+            {home.featured.title && (
+              <h2 id="home-start" className="text-[clamp(2.4rem,5vw,3.75rem)] text-heading">
+                {home.featured.title}
+              </h2>
+            )}
+            {home.featured.subtitle && <p className="mt-2 text-lg text-ink-soft">{home.featured.subtitle}</p>}
           </div>
-        </div>
-      </section>
-
-      {/* Productos Destacados */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-black mb-4 text-gray-900">
-              FEATURED <span className="text-orange-600">EQUIPMENT</span>
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Top-rated gear trusted by champions
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredProducts.map((product, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className="card-fitness overflow-hidden group cursor-pointer"
-              >
-                <div className="aspect-square bg-gray-200 overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 group-hover:scale-110 transition-transform duration-300"></div>
-                </div>
-                <div className="p-6">
-                  <div className="text-xs font-bold text-orange-600 mb-2">
-                    {product.category}
-                  </div>
-                  <h3 className="text-xl font-black mb-2 text-gray-900">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    {product.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-black text-red-600">
-                      ${product.price}
-                    </span>
-                    <button
-                      onClick={() => addToCart({
-                        id: `home-${index}`,
-                        name: product.name,
-                        price: product.price,
-                      })}
-                      className="btn-energy text-sm py-2 px-4"
-                    >
-                      ADD TO CART
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link href="/products">
-              <a className="btn-secondary inline-flex items-center gap-2">
-                VIEW ALL PRODUCTS
-                <ArrowRight className="w-5 h-5" />
-              </a>
+          {catalog.items.length > 0 && (
+            <Link href="/products" className="btn btn-quiet">
+              {t('catalog.viewAll')}
             </Link>
-          </div>
+          )}
         </div>
+        {catalog.isLoading ? (
+          <div className="grid gap-4 lg:grid-cols-2">
+            {Array.from({ length: 4 }, (_, i) => (
+              <RunCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : catalog.isError ? (
+          <SectionError title={t('catalog.error.title')} onRetry={catalog.refetch} />
+        ) : featured.length === 0 ? (
+          <p className="rounded-frame bg-surface-raised p-6 text-ink-soft shadow-soft">{t('catalog.empty.store')}</p>
+        ) : (
+          <ul className="grid gap-4 lg:grid-cols-2">
+            {featured.map((item) => (
+              <li key={item.id}>
+                <RunCard item={item} category={categoryOf(item.categoryId)} />
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gray-900 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="max-w-3xl mx-auto"
-          >
-            <h2 className="text-5xl font-black mb-6">
-              READY TO{' '}
-              <span className="gradient-energy bg-clip-text text-transparent">
-                DOMINATE?
-              </span>
-            </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Join our community of champions and start your transformation
-              today.
-            </p>
-            <button className="btn-energy text-lg">
-              GET STARTED NOW
-            </button>
-          </motion.div>
-        </div>
-      </section>
-    </div>
+      {home.benefits.length > 0 && (
+        <section className="page pt-20">
+          <div aria-hidden="true" className="lane-rule mb-10" />
+          <ul className="grid gap-8 md:grid-cols-3">
+            {home.benefits.map((benefit) => (
+              <li key={benefit.title} className="flex gap-4">
+                <span className="grid h-12 w-12 shrink-0 -skew-x-6 place-items-center rounded-md bg-[color:var(--accent)] text-[color:var(--accent-ink)]">
+                  <CmsIcon icon={benefit.icon} className="h-6 w-6 skew-x-6" strokeWidth={2} />
+                </span>
+                <div>
+                  <h3 className="text-2xl text-heading">{benefit.title}</h3>
+                  {benefit.description && <p className="mt-1 text-ink-soft">{benefit.description}</p>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {(home.story.title || story.length > 0) && (
+        <section className="page pt-20">
+          <div className="grid gap-8 md:grid-cols-12 md:items-center md:gap-12">
+            {home.story.image && (
+              <div className="slant aspect-[4/3] overflow-hidden bg-surface-quiet md:col-span-6">
+                <StoreImage src={home.story.image} alt="" sizes="(min-width: 768px) 45vw, 100vw" maxWidth={1280} fallback={<Placeholder />} />
+              </div>
+            )}
+            <div className={home.story.image ? 'md:col-span-6' : 'md:col-span-9'}>
+              {home.story.title && <h2 className="text-[clamp(2.4rem,5vw,3.75rem)] text-heading">{home.story.title}</h2>}
+              <div className="mt-4 flex max-w-[60ch] flex-col gap-3 text-lg text-ink-soft">
+                {story.map((p) => (
+                  <p key={p}>{p}</p>
+                ))}
+              </div>
+              <Link href="/about" className="btn btn-quiet mt-7">
+                {t('nav.about')}
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {(home.cta.title || home.cta.description) && (
+        <section className="page pt-20">
+          <div className="on-deep flex flex-col gap-6 rounded-frame bg-surface-deep p-8 text-ink-on-deep md:flex-row md:items-center md:justify-between md:p-12">
+            <div className="max-w-xl">
+              {home.cta.title && <h2 className="text-[clamp(2.4rem,5vw,3.5rem)]">{home.cta.title}</h2>}
+              {home.cta.description && <p className="mt-2 text-lg text-ink-on-deep-soft">{home.cta.description}</p>}
+            </div>
+            {home.cta.buttonText && (
+              <Link href="/contact" className="btn btn-lane shrink-0">
+                {home.cta.buttonText}
+              </Link>
+            )}
+          </div>
+        </section>
+      )}
+    </>
   );
 }
-
-const features = [
-  {
-    icon: <Zap className="w-8 h-8 text-white" />,
-    title: 'PREMIUM QUALITY',
-    description: 'Professional-grade equipment built to last',
-  },
-  {
-    icon: <Target className="w-8 h-8 text-white" />,
-    title: 'EXPERT GUIDANCE',
-    description: 'Training programs designed by certified coaches',
-  },
-  {
-    icon: <TrendingUp className="w-8 h-8 text-white" />,
-    title: 'TRACK PROGRESS',
-    description: 'Advanced tools to monitor your gains',
-  },
-  {
-    icon: <Award className="w-8 h-8 text-white" />,
-    title: 'PROVEN RESULTS',
-    description: 'Thousands of success stories and counting',
-  },
-];
-
-const featuredProducts = [
-  {
-    category: 'STRENGTH TRAINING',
-    name: 'Pro Adjustable Dumbbells',
-    description: 'Space-saving design with quick weight adjustment',
-    price: 299,
-  },
-  {
-    category: 'CARDIO',
-    name: 'Elite Rowing Machine',
-    description: 'Full-body workout with performance tracking',
-    price: 899,
-  },
-  {
-    category: 'ACCESSORIES',
-    name: 'Premium Yoga Mat',
-    description: 'Non-slip, eco-friendly, extra cushioning',
-    price: 49,
-  },
-];

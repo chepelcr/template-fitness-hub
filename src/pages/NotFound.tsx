@@ -1,24 +1,24 @@
 import { Link } from 'wouter';
-import { Home } from 'lucide-react';
+import { usePageMeta } from '@/core';
+import { useI18n } from '@/i18n';
 
 export default function NotFound() {
+  const { t } = useI18n();
+  usePageMeta(t('notFound.title'));
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-9xl font-black text-gray-200">404</h1>
-        <h2 className="text-4xl font-black text-gray-900 mb-4">
-          PAGE NOT <span className="text-red-600">FOUND</span>
-        </h2>
-        <p className="text-gray-600 mb-8">
-          Looks like this page took a rest day.
-        </p>
-        <Link href="/">
-          <a className="btn-energy inline-flex items-center gap-2">
-            <Home className="w-5 h-5" />
-            BACK TO HOME
-          </a>
+    <section className="track on-track relative overflow-hidden">
+      <svg aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <path key={i} d={`M${62 + i * 9} 0L${48 + i * 9} 100`} fill="none" strokeWidth="3" vectorEffect="non-scaling-stroke" style={{ stroke: 'var(--lane-line)', strokeOpacity: 0.55 }} />
+        ))}
+      </svg>
+      <div className="page relative py-20 md:py-28">
+        <h1 className="max-w-2xl text-[clamp(3rem,8vw,6rem)]">{t('notFound.title')}</h1>
+        <p className="mt-5 max-w-md text-xl">{t('notFound.body')}</p>
+        <Link href="/" className="btn btn-lane mt-8">
+          {t('notFound.cta')}
         </Link>
       </div>
-    </div>
+    </section>
   );
 }

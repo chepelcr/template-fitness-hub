@@ -1,75 +1,47 @@
-# Fitness Hub Template
+# Fitness Hub — storefront template
 
-Premium fitness equipment and wellness e-commerce template for Tsuru platform.
+The energy of a running track for gyms, studios, trainers and sports shops:
+a tartan hero whose lane lines sweep in along the photo, categories as the
+track's lanes, horizontal cards and session durations on a scoreboard. Design
+plan: [`DESIGN.md`](DESIGN.md).
 
-## Theme Specifications
+## How it works
 
-- **Primary Color**: Energetic Red `#dc2626`
-- **Secondary Color**: Bold Orange `#ea580c`
-- **Accent Color**: Deep Black `#0a0a0a`
-- **Font**: Montserrat (bold, athletic)
-- **Style**: Energetic, motivational, dynamic, high-contrast
-- **Aesthetic**: Athletic, performance-focused
+React 18 + Vite + Tailwind. Everything the store shows is data — branding,
+CMS copy (`home`, `about`, `products`, `contact`), products and services,
+categories, contact — read through `src/core/`, vendored from the monorepo's
+`templates/_core` (do not edit it here). Template code is the design:
+`src/components`, `src/pages`, `src/theme`, `src/i18n`.
 
-## Features
+`/config.json`: `{ "mode": "demo", "templateId": … }` shows the template's demo
+rows; a provisioned store gets `{ "mode": "live", "orgId": … }`.
 
-- Bold, high-energy design
-- Motivational typography and messaging
-- Progress tracking UI components
-- Achievement badge system
-- Dark mode support (gym aesthetic)
-- Responsive design
-- Framer Motion animations
+## Pages
 
-## Installation
+`/` · `/products` (`?type=`, `?category=`, `?sale=1`, `?q=`, `?sort=`) ·
+`/products/:id` · `/about` · `/contact` · 404. Old URLs (`/deals`,
+`/services`, `/programs`, `/category/:slug`…) redirect into the catalog.
+
+## Effects
+
+CSS and SVG only: the lane lines sweep in once and route changes wipe on a
+slant. Reduced motion (the system setting or `?motion=reduce`) shows the
+final state.
+
+## Development
 
 ```bash
-# Install dependencies
-npm install
-
-# Run development server (port 3002)
-npm run dev
-
-# Build for production
-npm run build
+pnpm install
+pnpm dev        # http://localhost:5173
+pnpm build      # tsc + vite build → dist/
 ```
 
-## Build Output
-
-Builds to: `../../dist/templates/fitness-hub`
-
-## Components
-
-### Fitness-Specific Components
-
-- **ProgressIndicator**: Animated progress bars for tracking fitness goals
-- **AchievementBadge**: Gamification badges for user achievements
-
-### Layout Components
-
-- **Navbar**: Athletic-themed navigation with dark background
-- **Footer**: Multi-column footer with social links and newsletter
-
-### Pages
-
-- **Home**: Hero section with motivational copy and featured products
-- **Products**: Product grid with filtering and search
-- **ProductDetail**: Individual product view (placeholder)
-- **Cart**: Shopping cart with quantity controls
-- **NotFound**: Custom 404 page
+Against a local management-be: `TSURU_DEV_API=http://localhost:5000
+VITE_PUBLIC_API_URL=http://localhost:5173 pnpm dev`.
 
 ## Deployment
 
-This template is designed to be deployed to:
-- **URL**: https://fitness-hub.examples.tsuru.jcampos.dev
-- **S3 Bucket**: fitness-hub-example
-- **CloudFront**: Configured with wildcard SSL cert
-
-## Color Psychology
-
-The color scheme is designed to:
-- **Red**: Evoke energy, motivation, and action
-- **Orange**: Create enthusiasm and workout intensity
-- **Black**: Convey strength and serious training focus
-
-This creates a high-contrast, athletic aesthetic that appeals to fitness enthusiasts and athletes.
+`.github/workflows/deploy.yml`: `develop` → GitHub Pages
+(`fitness-hub.examples.tsuru.jcampos.dev`, dev); `main` → production example
+hosting (`fitness-hub.examples.tsuru.lat`); each deploy notifies the
+provisioner to refresh stores using this template.

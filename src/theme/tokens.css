@@ -1,0 +1,61 @@
+/*
+ * Fitness Hub design tokens — three layers (see DESIGN.md).
+ * 1 primitives → 2 semantic roles → 3 component tokens.
+ * `--brand*` and `--font-display` are set at run time from the store's branding.
+ */
+:root {
+  /* 1 · Primitives — Pista */
+  --fh-tartan: #C4432B;
+  --fh-tartan-text: #A93520;
+  --fh-lane: #F7F6F2;
+  --fh-infield: #E9E7E0;
+  --fh-stadium: #1C3A6E;
+  --fh-stadium-lift: #27497F;
+  --fh-lane-soft: #C9D3E3;
+  --fh-ink: #22201E;
+  --fh-ink-soft: #5C5752;
+  --fh-white: #FFFFFF;
+
+  /* 2 · Semantic */
+  --surface: var(--fh-lane);
+  --surface-quiet: var(--fh-infield);
+  --surface-raised: var(--fh-white);
+  --surface-deep: var(--fh-stadium);
+  --surface-deep-raised: var(--fh-stadium-lift);
+  --ink: var(--fh-ink);
+  --ink-soft: var(--fh-ink-soft);
+  --ink-on-deep: var(--fh-lane);
+  --ink-on-deep-soft: var(--fh-lane-soft);
+  --heading: var(--fh-ink);
+  --rule: color-mix(in srgb, var(--fh-ink) 15%, transparent);
+  --rule-on-deep: color-mix(in srgb, var(--fh-lane) 22%, transparent);
+  --accent: var(--brand, var(--fh-tartan));
+  --accent-ink: var(--brand-ink, var(--fh-white));
+  --accent-text: var(--brand-text, var(--fh-tartan-text));
+  --accent-2: var(--brand-2, var(--fh-stadium));
+  --accent-2-ink: var(--brand-2-ink, var(--fh-white));
+  --offer: var(--fh-tartan-text);
+  --danger: var(--fh-tartan-text);
+  --success: #2E6B3F;
+  --focus: var(--fh-stadium);
+  --focus-on-deep: var(--fh-lane);
+  --scrim: rgb(34 32 30 / 0.6);
+
+  /* 3 · Component */
+  --font-display: "Barlow Condensed", "Noto Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-text: "Barlow", "Noto Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radius-frame: 0.75rem;
+  --radius-frame-sm: 0.5rem;
+  --radius-pill: 999px;
+  --lane-line: var(--fh-lane);
+  --skew: -8deg;
+  --shadow-soft: 0 1px 2px rgb(34 32 30 / 0.1), 0 12px 26px -16px rgb(34 32 30 / 0.4);
+  --shadow-lift: 0 2px 4px rgb(34 32 30 / 0.12), 0 22px 40px -20px rgb(34 32 30 / 0.5);
+  --tap: 2.75rem;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --max: 78rem;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.5, 0, 0.75, 0);
+  --dur-enter: 240ms;
+  --dur-exit: 150ms;
+}
