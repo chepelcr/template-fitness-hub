@@ -1,147 +1,317 @@
+@import './core/core.css';
+@import './theme/tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Fitness Hub Theme Colors */
-    /* Primary: Energetic Red #dc2626 */
-    /* Secondary: Bold Orange #ea580c */
-    /* Accent: Deep Black #0a0a0a */
-
-    /* Background & Foreground */
-    --background: 0 0% 100%; /* White */
-    --foreground: 0 0% 4%; /* Near Black #0a0a0a */
-
-    /* Card */
-    --card: 0 0% 100%; /* White */
-    --card-foreground: 0 0% 4%;
-
-    /* Popover */
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 4%;
-
-    /* Primary: Energetic Red */
-    --primary: 0 72% 51%; /* #dc2626 - Red 600 */
-    --primary-foreground: 0 0% 100%; /* White text on red */
-
-    /* Secondary: Bold Orange */
-    --secondary: 20 91% 48%; /* #ea580c - Orange 600 */
-    --secondary-foreground: 0 0% 100%; /* White text on orange */
-
-    /* Accent: Deep Black */
-    --accent: 0 0% 4%; /* #0a0a0a - Near black */
-    --accent-foreground: 0 0% 100%; /* White text on black */
-
-    /* Muted */
-    --muted: 0 0% 96%; /* Gray 50 */
-    --muted-foreground: 0 0% 45%;
-
-    /* Destructive */
-    --destructive: 0 84% 60%; /* Red 500 */
-    --destructive-foreground: 0 0% 100%;
-
-    /* Border, Input, Ring */
-    --border: 0 0% 90%; /* Gray 200 */
-    --input: 0 0% 90%;
-    --ring: 0 72% 51%; /* Primary red for focus rings */
-
-    /* Border Radius */
-    --radius: 0.5rem;
-
-    /* Brand Colors for Explicit Control */
-    /* Energetic Red */
-    --brand-red-50: 0 86% 97%;
-    --brand-red-100: 0 93% 94%;
-    --brand-red-500: 0 72% 51%;
-    --brand-red-600: 0 72% 51%; /* Primary */
-    --brand-red-700: 0 74% 42%;
-    --brand-red-800: 0 70% 35%;
-    --brand-red-900: 0 63% 31%;
-
-    /* Bold Orange */
-    --brand-orange-50: 24 100% 97%;
-    --brand-orange-100: 24 100% 93%;
-    --brand-orange-500: 21 90% 48%;
-    --brand-orange-600: 20 91% 48%; /* Secondary */
-    --brand-orange-700: 16 84% 40%;
-    --brand-orange-800: 15 79% 34%;
+  html {
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-text);
+    -webkit-text-size-adjust: 100%;
   }
 
-  .dark {
-    /* Dark Mode: High-contrast gym aesthetic */
-    --background: 0 0% 4%; /* Near black */
-    --foreground: 0 0% 98%; /* Off-white */
-
-    --card: 222 47% 11%; /* Dark slate */
-    --card-foreground: 0 0% 98%;
-
-    --popover: 222 47% 11%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 0 72% 51%; /* Keep energetic red */
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 20 91% 48%; /* Keep bold orange */
-    --secondary-foreground: 0 0% 100%;
-
-    --accent: 222 47% 11%; /* Dark slate for accent */
-    --accent-foreground: 0 0% 98%;
-
-    --muted: 217 33% 17%; /* Dark gray */
-    --muted-foreground: 215 20% 65%;
-
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 0 72% 51%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    margin: 0;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: -0.005em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-weight: 700;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .on-deep :focus-visible,
+  .on-track :focus-visible {
+    outline-color: var(--fh-lane);
+  }
+
+  ::selection {
+    background: var(--fh-tartan);
+    color: var(--fh-white);
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
   }
 }
 
-@layer utilities {
-  /* Fitness-specific utility classes */
-  .text-energy {
-    @apply text-red-600 font-bold;
+@layer components {
+  .page {
+    width: 100%;
+    max-width: var(--max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
   }
 
-  .text-motivational {
-    @apply text-orange-600 font-extrabold uppercase tracking-wide;
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: var(--tap);
+    padding: 0.625rem 1.375rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: transform var(--dur-exit) var(--ease-out), background-color var(--dur-exit) ease, box-shadow var(--dur-exit) ease;
   }
 
-  .gradient-energy {
-    @apply bg-gradient-to-r from-red-600 to-orange-600;
+  .btn:active:not(:disabled) {
+    transform: translateY(1px);
   }
 
-  .gradient-dark {
-    @apply bg-gradient-to-b from-gray-900 to-gray-800;
+  .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
   }
 
-  .btn-energy {
-    @apply bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 transition-all transform hover:scale-105 active:scale-95;
+  .btn-accent {
+    background: var(--accent);
+    color: var(--accent-ink);
   }
 
-  .btn-secondary {
-    @apply bg-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-orange-700 transition-all transform hover:scale-105 active:scale-95;
+  .btn-accent:hover:not(:disabled) {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
   }
 
-  .card-fitness {
-    @apply bg-card border border-border rounded-lg shadow-lg hover:shadow-xl transition-shadow;
+  .btn-strong {
+    background: var(--fh-stadium);
+    color: var(--fh-white);
   }
 
-  /* Progress bar styles */
-  .progress-energy {
-    @apply h-2 bg-gradient-to-r from-red-600 to-orange-600 rounded-full;
+  .btn-strong:hover:not(:disabled) {
+    background: var(--fh-stadium-lift);
   }
+
+  .btn-quiet {
+    background: var(--surface-raised);
+    color: var(--heading);
+    box-shadow: inset 0 0 0 2px var(--rule);
+  }
+
+  .btn-quiet:hover:not(:disabled) {
+    box-shadow: inset 0 0 0 2px var(--heading);
+  }
+
+  .btn-lane {
+    background: var(--fh-lane);
+    color: var(--fh-ink);
+  }
+
+  .btn-lane:hover:not(:disabled) {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--fh-lane) 40%, transparent);
+  }
+
+  .btn-on-deep {
+    background: transparent;
+    color: var(--fh-white);
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--fh-white) 55%, transparent);
+  }
+
+  .btn-on-deep:hover:not(:disabled) {
+    box-shadow: inset 0 0 0 2px var(--fh-white);
+  }
+
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    min-width: var(--tap);
+    min-height: var(--tap);
+    border-radius: 0.5rem;
+  }
+
+  .gloss {
+    display: none;
+  }
+
+  .frame {
+    border-radius: var(--radius-frame);
+    overflow: hidden;
+  }
+
+  .frame-sm {
+    border-radius: var(--radius-frame-sm);
+    overflow: hidden;
+  }
+
+  .field {
+    width: 100%;
+    min-height: var(--tap);
+    padding: 0.625rem 0.875rem;
+    border-radius: 0.5rem;
+    background: var(--surface-raised);
+    color: var(--ink);
+    box-shadow: inset 0 0 0 2px var(--rule);
+    font: inherit;
+  }
+
+  .field[aria-invalid='true'] {
+    box-shadow: inset 0 0 0 2px var(--danger);
+  }
+
+  .skeleton {
+    background: linear-gradient(100deg, var(--surface-quiet) 30%, var(--fh-white) 50%, var(--surface-quiet) 70%);
+    background-size: 300% 100%;
+    animation: skeleton-sweep 1.5s ease-in-out infinite;
+    border-radius: 0.5rem;
+  }
+
+  .skeleton-deep {
+    background: color-mix(in srgb, var(--fh-white) 18%, transparent);
+    border-radius: 0.5rem;
+  }
+
+  .price-tag {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-style: italic;
+    font-variant-numeric: tabular-nums;
+    color: var(--heading);
+  }
+
+  /* The track: tartan with white lane lines between rows. */
+  .track {
+    background: var(--fh-tartan);
+    color: var(--fh-white);
+  }
+
+  .lanes > * + * {
+    box-shadow: inset 0 3px 0 var(--lane-line);
+  }
+
+  /* A lane divider: two parallel lines in the accent. */
+  .lane-rule {
+    height: 9px;
+    border-block: 3px solid var(--accent);
+  }
+
+  /* A slanted cut, like a lane marking. */
+  .slant {
+    clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+/* The hero's lane lines sweep across once. */
+.lane-sweep {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: lane-sweep 900ms var(--ease-out) backwards;
+}
+
+/* Drawn is the resting state, so the lines show even where animation never runs. */
+@keyframes lane-sweep {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+/* Route changes wipe on a slant (core.css stops it under reduced motion). */
+::view-transition-old(root) {
+  animation: none;
+}
+
+::view-transition-new(root) {
+  animation: route-wipe 320ms var(--ease-out);
+}
+
+@keyframes route-wipe {
+  from {
+    clip-path: polygon(0 0, 0 0, -18% 100%, 0 100%);
+  }
+  to {
+    clip-path: polygon(0 0, 118% 0, 100% 100%, 0 100%);
+  }
+}
+
+.cart-dash {
+  animation: cart-dash 520ms var(--ease-out);
+}
+
+@keyframes cart-dash {
+  0% {
+    transform: translateX(0);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes skeleton-sweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@keyframes sheet-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes sheet-in-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.overlay[data-state='open'] {
+  animation: fade-in var(--dur-enter) ease;
+}
+
+.sheet[data-state='open'] {
+  animation: sheet-in-up var(--dur-enter) var(--ease-out);
+}
+
+@media (min-width: 768px) {
+  .sheet[data-state='open'] {
+    animation-name: sheet-in-right;
+  }
+}
+
+.dialog-pop[data-state='open'] {
+  animation: fade-in var(--dur-enter) var(--ease-out);
 }

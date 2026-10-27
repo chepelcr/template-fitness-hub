@@ -1,44 +1,80 @@
-import { SubdomainProvider } from '@/contexts/SubdomainContext';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { Route, Switch } from 'wouter';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
+import {
+  createStoreQueryClient,
+  LegacyOrNotFound,
+  LiveRegion,
+  MAIN_ID,
+  RouteFocus,
+  SkipLink,
+  StoreProvider,
+  StoreRouter,
+  useCartReconciliation,
+  useCatalog,
+  useStore,
+} from '@/core';
+import { I18nProvider, useI18n } from '@/i18n';
+import { CartSheet } from '@/components/CartSheet';
+import { Checkout } from '@/components/Checkout';
+import { Footer } from '@/components/Footer';
+import { Header } from '@/components/Header';
+import { StoreError, StoreUnconfigured } from '@/components/StoreStates';
+import { themeDefaults } from '@/theme/defaults';
+import About from '@/pages/About';
+import Catalog from '@/pages/Catalog';
+import Contact from '@/pages/Contact';
 import Home from '@/pages/Home';
-import Products from '@/pages/Products';
-import ProductDetail from '@/pages/ProductDetail';
 import NotFound from '@/pages/NotFound';
-import DealsPage from "@/pages/DealsPage";
-import ServicesPage from "@/pages/ServicesPage";
-import ProgramsPage from "@/pages/ProgramsPage";
-import AboutPage from "@/pages/AboutPage";
-import CartSidebar from '@/components/cart/cart-sidebar';
-import CheckoutModal from '@/components/cart/checkout-modal';
-import { Toaster } from '@/components/ui/toaster';
+import ProductPage from '@/pages/ProductPage';
 
-function App() {
+const queryClient = createStoreQueryClient();
+
+function Shell() {
+  const { status, retry } = useStore();
+  const { t } = useI18n();
+  const catalog = useCatalog();
+  const removedMessage = useCallback((names: string) => t('cart.removedUnavailable', { names }), [t]);
+  useCartReconciliation(catalog.items, !catalog.isLoading && !catalog.isError, removedMessage);
+
+  if (status === 'unconfigured') return <StoreUnconfigured />;
+  if (status === 'error') return <StoreError onRetry={retry} />;
+
   return (
-    <SubdomainProvider>
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-1">
+    <>
+      <SkipLink label={t('skip.content')} />
+      <Header />
+      <main id={MAIN_ID}>
         <Switch>
           <Route path="/" component={Home} />
-          <Route path="/products" component={Products} />
-          <Route path="/products/:id" component={ProductDetail} />
-          <Route path="/deals" component={DealsPage} />
-          <Route path="/services" component={ServicesPage} />
-          <Route path="/programs" component={ProgramsPage} />
-          <Route path="/about" component={AboutPage} />
-          <Route component={NotFound} />
+          <Route path="/products" component={Catalog} />
+          <Route path="/products/:id" component={ProductPage} />
+          <Route path="/about" component={About} />
+          <Route path="/contact" component={Contact} />
+          <Route>
+            <LegacyOrNotFound notFound={NotFound} />
+          </Route>
         </Switch>
       </main>
       <Footer />
-      <CartSidebar />
-      <CheckoutModal />
-      <Toaster />
-    </div>
-  );
-    </SubdomainProvider>
+      <CartSheet />
+      <Checkout />
+      <RouteFocus />
+      <LiveRegion />
+    </>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <I18nProvider>
+        <StoreProvider theme={themeDefaults}>
+          <StoreRouter>
+            <Shell />
+          </StoreRouter>
+        </StoreProvider>
+      </I18nProvider>
+    </QueryClientProvider>
+  );
+}
