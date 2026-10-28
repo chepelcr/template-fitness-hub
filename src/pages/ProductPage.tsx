@@ -9,6 +9,7 @@ import { QuantityStepper } from '@/components/QuantityStepper';
 import { RunCard } from '@/components/RunCard';
 import { Scoreboard } from '@/components/Scoreboard';
 import { StoreImage } from '@/components/StoreImage';
+import { SectionError } from '@/components/StoreStates';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -26,6 +27,14 @@ export default function ProductPage() {
           <div className="skeleton h-9 w-36" />
           <div className="skeleton h-40 w-full" />
         </div>
+      </div>
+    );
+  }
+
+  if (catalog.isError) {
+    return (
+      <div className="page pt-16">
+        <SectionError title={t('catalog.error.title')} onRetry={catalog.refetch} />
       </div>
     );
   }
